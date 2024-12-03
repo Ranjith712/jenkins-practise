@@ -1,0 +1,51 @@
+pipeline {
+    agent any  // This defines where the pipeline will run (can be any available agent or node)
+
+    environment {
+        JAVA_HOME = '/usr/lib/jvm/java-11-openjdk-amd64'  // Set your Java home path here
+        MAVEN_HOME = '/opt/maven'  // Set Maven home path if not already in PATH
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from your Git repository
+                git 'https://github.com/your-repository/your-java-project.git'  // Replace with your Git repository URL
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    // Build the Java application using Maven
+                    echo 'Building Java Hello World application...'
+                    sh 'mvn clean install'  // Ensure your project has a pom.xml file
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    // Run the tests (if any) or run the application to verify
+                    echo 'Running Java Hello World application...'
+                    sh 'java -cp target/your-app.jar com.example.HelloWorld'  // Adjust this to your class name and path
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up actions (if needed)
+            echo 'Cleaning up...'
+        }
+        success {
+            echo 'Build and run successful!'
+        }
+        failure {
+            echo 'Build failed, please check logs!'
+        }
+    }
+}
